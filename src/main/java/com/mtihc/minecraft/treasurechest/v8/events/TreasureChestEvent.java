@@ -7,17 +7,17 @@ import com.mtihc.minecraft.treasurechest.v8.core.ITreasureChest;
 
 public abstract class TreasureChestEvent extends Event {
 
-	private ITreasureChest tchest;
- 
-	protected TreasureChestEvent(ITreasureChest tchest) {
-    	this.tchest = tchest;
+    private ITreasureChest tchest;
+
+    protected TreasureChestEvent(ITreasureChest tchest) {
+        this.tchest = tchest;
     }
-	
-	public ITreasureChest getTreasureChest() {
-		return tchest;
-	}
-	
-	public Location getLocation() {
-		return tchest.getContainer().getLocation();
-	}
+
+    public ITreasureChest getTreasureChest() {
+        return tchest;
+    }
+
+    public Location getLocation() {
+        return tchest.getContainer().getLocation();
+    }
 }

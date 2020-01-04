@@ -24,13 +24,13 @@
 #   - admin
 # 
 defaults:
-    messages:
-        found: 'You have found treasure!'
-        found_already: 'You have already looted this treasure...'
-        unlimited: 'Take as much as you want!'
-    ignoreProtection: false
+  messages:
+    found: 'You have found treasure!'
+    found_already: 'You have already looted this treasure...'
+    unlimited: 'Take as much as you want!'
+  ignoreProtection: false
 rewards:
-    restore:
-        subregion-size: 50
-        subregion-ticks: 10
+  restore:
+    subregion-size: 50
+    subregion-ticks: 10
 ranks: []

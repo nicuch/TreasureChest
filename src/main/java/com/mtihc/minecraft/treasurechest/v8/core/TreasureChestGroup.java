@@ -14,101 +14,100 @@ import org.bukkit.util.Vector;
 
 /**
  * Class representing a group of treasures.
- * 
- * @author Mitch
  *
+ * @author Mitch
  */
 public class TreasureChestGroup implements ITreasureChestGroup {
 
-	private String world;
-	private String name;
-	private List<Location> chests;
-	
-	/**
-	 * Constructor.
-	 * @param world the world name
-	 * @param name the group name
-	 */
-	public TreasureChestGroup(String world, String name) {
-		this.world = world;
-		this.name = name;
-		
-		chests = new ArrayList<Location>();
-	}
+    private String world;
+    private String name;
+    private List<Location> chests;
 
-	/**
-	 * Deserialization constructor.
-	 * @param values the serialized values
-	 */
-	public TreasureChestGroup(Map<String, Object> values) {
-		chests = new ArrayList<Location>();
+    /**
+     * Constructor.
+     *
+     * @param world the world name
+     * @param name  the group name
+     */
+    public TreasureChestGroup(String world, String name) {
+        this.world = world;
+        this.name = name;
 
-		int count, i;
-		this.world = (String) values.get("world");
-		this.name = (String) values.get("name");
-		count = (Integer) values.get("count");
+        chests = new ArrayList<>();
+    }
 
-		Map<?, ?> chestsSection = (Map<?, ?>) values.get("chests");
-		for (i=0;i<count;i++) {
-			Vector coords = (Vector) chestsSection.get("chest" + i);
-			Location loc = coords.toLocation(Bukkit.getWorld(world));
-			chests.add(loc);
-		}
-	}
-	
-	@Override
-	public void addChest(ITreasureChest chest) throws Exception {
-		String chestsWorld = chest.getContainer().getLocation().getWorld().getName();
-		if (chestsWorld.equals(world)) {
-			Location newLoc = chest.getContainer().getLocation();
+    /**
+     * Deserialization constructor.
+     *
+     * @param values the serialized values
+     */
+    public TreasureChestGroup(Map<String, Object> values) {
+        chests = new ArrayList<>();
 
-			if (!chests.contains(newLoc)) {
-				chests.add(chest.getContainer().getLocation());
-				return;
-			}
-			
-			throw new Exception("Treasure is already in the group.");
-		}
-		throw new Exception("Treasure (in world " + chestsWorld + ") is not in the same world as the group (" + world + ")");
-	}
-	
-	@Override
-	public boolean removeChest(ITreasureChest chest) throws Exception {
-		if (!chests.contains(chest.getContainer().getLocation())) {
-			throw new Exception("Treasure is not in the group.");
-		}
-		return chests.remove(chest.getContainer().getLocation());
-	}
+        int count, i;
+        this.world = (String) values.get("world");
+        this.name = (String) values.get("name");
+        count = (Integer) values.get("count");
 
-	@Override
-	public Set<Location> getLocations() {
-		final Set<Location> result = new HashSet<Location>();
-		Iterator<Location> i = chests.iterator();
-		while(i.hasNext()) {
-			result.add(i.next().clone());
-		}
+        Map<?, ?> chestsSection = (Map<?, ?>) values.get("chests");
+        for (i = 0; i < count; i++) {
+            Vector coords = (Vector) chestsSection.get("chest" + i);
+            Location loc = coords.toLocation(Bukkit.getWorld(world));
+            chests.add(loc);
+        }
+    }
 
-		return result;
-	}
-	
-	@Override
-	public Map<String, Object> serialize() {
-		Map<String, Object> values = new LinkedHashMap<String, Object>();
-		Map<String, Object> chestLocs = new LinkedHashMap<String, Object>();
-		Iterator<Location> i = chests.iterator();
-		int chestNum = 0;
-		
-		values.put("world", world);
-		values.put("name", name);
-		values.put("count", chests.size());
-		
-		while(i.hasNext()) {
-			Location c = i.next();
-			chestLocs.put("chest" + chestNum, c.toVector());
-			chestNum += 1;
-		}
-		values.put("chests", chestLocs);
-		
-		return values;
-	}
+    @Override
+    public void addChest(ITreasureChest chest) throws Exception {
+        String chestsWorld = chest.getContainer().getLocation().getWorld().getName();
+        if (chestsWorld.equals(world)) {
+            Location newLoc = chest.getContainer().getLocation();
+
+            if (!chests.contains(newLoc)) {
+                chests.add(chest.getContainer().getLocation());
+                return;
+            }
+
+            throw new Exception("Treasure is already in the group.");
+        }
+        throw new Exception("Treasure (in world " + chestsWorld + ") is not in the same world as the group (" + world + ")");
+    }
+
+    @Override
+    public boolean removeChest(ITreasureChest chest) throws Exception {
+        if (!chests.contains(chest.getContainer().getLocation())) {
+            throw new Exception("Treasure is not in the group.");
+        }
+        return chests.remove(chest.getContainer().getLocation());
+    }
+
+    @Override
+    public Set<Location> getLocations() {
+        final Set<Location> result = new HashSet<>();
+        for (Location chest : chests) { //Why was an iterator here? lol...
+            result.add(chest.clone());
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> serialize() {
+        Map<String, Object> values = new LinkedHashMap<>();
+        Map<String, Object> chestLocs = new LinkedHashMap<>();
+        Iterator<Location> i = chests.iterator();
+        int chestNum = 0;
+
+        values.put("world", world);
+        values.put("name", name);
+        values.put("count", chests.size());
+
+        while (i.hasNext()) {
+            Location c = i.next();
+            chestLocs.put("chest" + chestNum, c.toVector());
+            chestNum += 1;
+        }
+        values.put("chests", chestLocs);
+
+        return values;
+    }
 }

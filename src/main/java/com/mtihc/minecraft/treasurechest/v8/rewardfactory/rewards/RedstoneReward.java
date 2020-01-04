@@ -17,73 +17,72 @@ import com.mtihc.minecraft.treasurechest.v8.rewardfactory.IReward;
 import com.mtihc.minecraft.treasurechest.v8.rewardfactory.RewardException;
 import com.mtihc.minecraft.treasurechest.v8.rewardfactory.RewardInfo;
 
-@SuppressWarnings("deprecation")
 public class RedstoneReward implements IReward {
 
-	private RewardInfo info;
+    private RewardInfo info;
 
-	public RedstoneReward(Block attachedBlock, BlockFace facing) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		this.info = new RewardInfo("redstone", data);
+    public RedstoneReward(Block attachedBlock, BlockFace facing) {
+        Map<String, Object> data = new HashMap<>();
+        this.info = new RewardInfo("redstone", data);
 
-		setAttachedBlock(attachedBlock.getLocation());
-		setAttachedBlockType(attachedBlock.getType());
-		setFacingDirection(facing);
-	}
+        setAttachedBlock(attachedBlock.getLocation());
+        setAttachedBlockType(attachedBlock.getType());
+        setFacingDirection(facing);
+    }
 
-	RedstoneReward(RewardInfo info) {
-		this.info = info;
-	}
+    RedstoneReward(RewardInfo info) {
+        this.info = info;
+    }
 
-	@Override
-	public RewardInfo getInfo() {
-		return info;
-	}
+    @Override
+    public RewardInfo getInfo() {
+        return info;
+    }
 
-	public Location getAttachedBlock() {
-		World world = Bukkit.getWorld((String) info.getData("world"));
-		Vector coords = (Vector) info.getData("coords");
-		return coords.toLocation(world);
-	}
+    public Location getAttachedBlock() {
+        World world = Bukkit.getWorld((String) info.getData("world"));
+        Vector coords = (Vector) info.getData("coords");
+        return coords.toLocation(world);
+    }
 
-	public void setAttachedBlock(Location location) {
-		info.setData("world", location.getWorld().getName());
-		info.setData("coords", location.toVector());
-	}
+    public void setAttachedBlock(Location location) {
+        info.setData("world", location.getWorld().getName());
+        info.setData("coords", location.toVector());
+    }
 
-	public Material getAttachedBlockType() {
-		return Material.getMaterial(info.getData("block-type").toString());
-	}
+    public Material getAttachedBlockType() {
+        return Material.getMaterial(info.getData("block-type").toString());
+    }
 
-	public void setAttachedBlockType(Material type) {
-		info.setData("block-type", type);
-	}
+    public void setAttachedBlockType(Material type) {
+        info.setData("block-type", type);
+    }
 
-	public BlockFace getFacingDirection() {
-		return BlockFace.valueOf((String) info.getData("facing"));
-	}
+    public BlockFace getFacingDirection() {
+        return BlockFace.valueOf((String) info.getData("facing"));
+    }
 
-	public void setFacingDirection(BlockFace facing) {
-		info.setData("facing", facing.name());
-	}
+    public void setFacingDirection(BlockFace facing) {
+        info.setData("facing", facing.name());
+    }
 
-	@Override
-	public String getDescription() {
-		Location loc = getAttachedBlock();
-		return "attach a redstone torch at " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + " in " + loc.getWorld().getName();
-	}
+    @Override
+    public String getDescription() {
+        Location loc = getAttachedBlock();
+        return "attach a redstone torch at " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + " in " + loc.getWorld().getName();
+    }
 
-	@Override
-	public void give(Player player) throws RewardException {
-		Location loc = getAttachedBlock();
-		BlockFace facing = getFacingDirection();
-		Block attachedBlock = loc.getBlock();
-		attachedBlock.setType(getAttachedBlockType());
-		Block torchBlock = attachedBlock.getRelative(facing);
-		torchBlock.setType(Material.REDSTONE_WALL_TORCH);
-		Directional torch = (Directional) torchBlock.getBlockData();
-		torch.setFacing(facing);
-		torchBlock.setBlockData(torch);
-	}
+    @Override
+    public void give(Player player) {
+        Location loc = getAttachedBlock();
+        BlockFace facing = getFacingDirection();
+        Block attachedBlock = loc.getBlock();
+        attachedBlock.setType(getAttachedBlockType());
+        Block torchBlock = attachedBlock.getRelative(facing);
+        torchBlock.setType(Material.REDSTONE_WALL_TORCH);
+        Directional torch = (Directional) torchBlock.getBlockData();
+        torch.setFacing(facing);
+        torchBlock.setBlockData(torch);
+    }
 
 }

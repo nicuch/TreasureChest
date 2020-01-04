@@ -8,31 +8,31 @@ import org.bukkit.inventory.Inventory;
 import com.mtihc.minecraft.treasurechest.v8.core.ITreasureChest;
 
 public class TreasureChestFoundUnlimitedEvent extends TreasureChestInventoryEvent implements Cancellable {
-	
-	private boolean cancelled;
 
-	public TreasureChestFoundUnlimitedEvent(Player player, ITreasureChest tchest,
-			Inventory inventory) {
-		super(tchest, player, inventory);
-	}
+    private boolean cancelled;
 
-	private static final HandlerList handlers = new HandlerList();
-	
+    public TreasureChestFoundUnlimitedEvent(Player player, ITreasureChest tchest,
+                                            Inventory inventory) {
+        super(tchest, player, inventory);
+    }
+
+    private static final HandlerList handlers = new HandlerList();
+
     public HandlerList getHandlers() {
         return handlers;
     }
- 
+
     public static HandlerList getHandlerList() {
         return handlers;
     }
 
-	@Override
-	public boolean isCancelled() {
-		return cancelled;
-	}
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
 
-	@Override
-	public void setCancelled(boolean value) {
-		this.cancelled = value;
-	}
+    @Override
+    public void setCancelled(boolean value) {
+        this.cancelled = value;
+    }
 }

@@ -26,153 +26,152 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class SpawnRewardFactory extends RewardFactory {
 
-	private JavaPlugin plugin;
-	private WorldEditPlugin worldEdit;
+    private JavaPlugin plugin;
+    private WorldEditPlugin worldEdit;
 
-	public SpawnRewardFactory(JavaPlugin plugin) {
-		this.plugin = plugin;
-		
-		Plugin we = plugin.getServer().getPluginManager().getPlugin("WorldEdit");
-		if(we != null && we instanceof WorldEditPlugin) {
-			worldEdit = (WorldEditPlugin) we;
-		}
-		else {
-			worldEdit = null;
-		}
-	}
+    public SpawnRewardFactory(JavaPlugin plugin) {
+        this.plugin = plugin;
 
-	@Override
-	public String getLabel() {
-		return "spawn";
-	}
+        Plugin we = plugin.getServer().getPluginManager().getPlugin("WorldEdit");
+        if (we instanceof WorldEditPlugin) {
+            worldEdit = (WorldEditPlugin) we;
+        } else {
+            worldEdit = null;
+        }
+    }
 
-	@Override
-	public String getGeneralDescription() {
-		return "spawn mobs in a region";
-	}
+    @Override
+    public String getLabel() {
+        return "spawn";
+    }
 
-	@Override
-	public IReward createReward(RewardInfo info) throws RewardException {
-		return new SpawnReward(info);
-	}
+    @Override
+    public String getGeneralDescription() {
+        return "spawn mobs in a region";
+    }
 
-	@Override
-	public void createReward(final CommandSender sender, final String[] args,
-			final CreateCallback callback) {
-		if(!(sender instanceof Player)) {
-			callback.onCreateException(sender, args, new RewardException("Expected a player."));
-			return;
-		}
-		
-		if(args != null && args.length > 0) {
-			callback.onCreateException(sender, args, new RewardException("Expected no arguments."));
-			return;
-		}
-		
-		final SpawnReward reward = new SpawnReward(new RewardInfo(getLabel(), new HashMap<String, Object>()));
-		
-		
-		Prompt prompt = new SelectEntityTypePrompt() {
-			
-			@Override
-			protected Prompt onFinish(ConversationContext context, EntityType type) {
-				reward.setEntityType(type);
-				
-				context.getForWhom().sendRawMessage(ChatColor.GREEN + "> Selected " + ChatColor.WHITE + type.name().toLowerCase().replace("_", " ") + ChatColor.GREEN + ".");
-				
-				return new SelectRegionPrompt(worldEdit) {
-					
-					@Override
-					protected Prompt onFinish(ConversationContext context, World world,
-							Vector min, Vector max) {
-						reward.setRegion(world, min, max);
-						
-						context.getForWhom().sendRawMessage(ChatColor.GREEN + "> Selected region " + ChatColor.WHITE + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + " " + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ChatColor.GREEN + " in " + ChatColor.WHITE + world.getName() + ChatColor.GREEN + ".");
-						return new MobAmountPrompt() {
+    @Override
+    public IReward createReward(RewardInfo info) {
+        return new SpawnReward(info);
+    }
 
-							@Override
-							protected Prompt onFinish(
-									ConversationContext context, int amount) {
-								reward.setAmount(amount);
-								callback.onCreate(sender, args, reward);
-								return END_OF_CONVERSATION;
-							}
-							
-						};
-					}
-					
-					@Override
-					protected Prompt onCancel(ConversationContext context) {
-						callback.onCreateException(sender, args, new RewardException("Cancelled region selection."));
-						return END_OF_CONVERSATION;
-					}
-				};
-			}
-			
-			@Override
-			protected Prompt onCancel(ConversationContext context) {
-				callback.onCreateException(sender, args, new RewardException("Cancelled mob type selection."));
-				return END_OF_CONVERSATION;
-			}
-		};
-		
-		new ConversationFactory(plugin)
-		.withFirstPrompt(prompt)
-		.withLocalEcho(false)
-		.withModality(false)
-		.buildConversation((Player) sender)
-		.begin();
-	}
-	
-	
-	private abstract class MobAmountPrompt extends ValidatingPrompt {
+    @Override
+    public void createReward(final CommandSender sender, final String[] args,
+                             final CreateCallback callback) {
+        if (!(sender instanceof Player)) {
+            callback.onCreateException(sender, args, new RewardException("Expected a player."));
+            return;
+        }
 
-		protected abstract Prompt onFinish(ConversationContext context, int amount);
-		
-		@Override
-		public String getPromptText(ConversationContext context) {
-			
-			return ChatColor.GOLD + "> How many mobs should spawn?";
-		}
+        if (args != null && args.length > 0) {
+            callback.onCreateException(sender, args, new RewardException("Expected no arguments."));
+            return;
+        }
 
-		@Override
-		protected Prompt acceptValidatedInput(ConversationContext context,
-				String input) {
-			int amount = (Integer) context.getSessionData("amount");
-			return onFinish(context, amount);
-		}
+        final SpawnReward reward = new SpawnReward(new RewardInfo(getLabel(), new HashMap<>()));
 
-		@Override
-		protected boolean isInputValid(ConversationContext context, String input) {
-			if(input.startsWith("/")) {
-				Bukkit.dispatchCommand((CommandSender) context.getForWhom(), input.substring(1));
-				return false;
-			}
-			int amount;
-			try {
-				amount = Integer.parseInt(input);
-			} catch(NumberFormatException e) {
-				context.getForWhom().sendRawMessage(ChatColor.RED + "Expected a number instead of text.");
-				return false;
-			}
-			
-			context.setSessionData("amount", amount);
-			return true;
-		}
-		
-	}
 
-	@Override
-	public String args() {
-		return "";
-	}
+        Prompt prompt = new SelectEntityTypePrompt() {
 
-	@Override
-	public String[] help() {
-		return new String[] {
-				"The plugin will ask you which mob.",
-				"And how many. And in which region."
-		};
-	}
+            @Override
+            protected Prompt onFinish(ConversationContext context, EntityType type) {
+                reward.setEntityType(type);
+
+                context.getForWhom().sendRawMessage(ChatColor.GREEN + "> Selected " + ChatColor.WHITE + type.name().toLowerCase().replace("_", " ") + ChatColor.GREEN + ".");
+
+                return new SelectRegionPrompt(worldEdit) {
+
+                    @Override
+                    protected Prompt onFinish(ConversationContext context, World world,
+                                              Vector min, Vector max) {
+                        reward.setRegion(world, min, max);
+
+                        context.getForWhom().sendRawMessage(ChatColor.GREEN + "> Selected region " + ChatColor.WHITE + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + " " + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ChatColor.GREEN + " in " + ChatColor.WHITE + world.getName() + ChatColor.GREEN + ".");
+                        return new MobAmountPrompt() {
+
+                            @Override
+                            protected Prompt onFinish(
+                                    ConversationContext context, int amount) {
+                                reward.setAmount(amount);
+                                callback.onCreate(sender, args, reward);
+                                return END_OF_CONVERSATION;
+                            }
+
+                        };
+                    }
+
+                    @Override
+                    protected Prompt onCancel(ConversationContext context) {
+                        callback.onCreateException(sender, args, new RewardException("Cancelled region selection."));
+                        return END_OF_CONVERSATION;
+                    }
+                };
+            }
+
+            @Override
+            protected Prompt onCancel(ConversationContext context) {
+                callback.onCreateException(sender, args, new RewardException("Cancelled mob type selection."));
+                return END_OF_CONVERSATION;
+            }
+        };
+
+        new ConversationFactory(plugin)
+                .withFirstPrompt(prompt)
+                .withLocalEcho(false)
+                .withModality(false)
+                .buildConversation((Player) sender)
+                .begin();
+    }
+
+
+    private abstract static class MobAmountPrompt extends ValidatingPrompt {
+
+        protected abstract Prompt onFinish(ConversationContext context, int amount);
+
+        @Override
+        public String getPromptText(ConversationContext context) {
+
+            return ChatColor.GOLD + "> How many mobs should spawn?";
+        }
+
+        @Override
+        protected Prompt acceptValidatedInput(ConversationContext context,
+                                              String input) {
+            int amount = (Integer) context.getSessionData("amount");
+            return onFinish(context, amount);
+        }
+
+        @Override
+        protected boolean isInputValid(ConversationContext context, String input) {
+            if (input.startsWith("/")) {
+                Bukkit.dispatchCommand((CommandSender) context.getForWhom(), input.substring(1));
+                return false;
+            }
+            int amount;
+            try {
+                amount = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                context.getForWhom().sendRawMessage(ChatColor.RED + "Expected a number instead of text.");
+                return false;
+            }
+
+            context.setSessionData("amount", amount);
+            return true;
+        }
+
+    }
+
+    @Override
+    public String args() {
+        return "";
+    }
+
+    @Override
+    public String[] help() {
+        return new String[]{
+                "The plugin will ask you which mob.",
+                "And how many. And in which region."
+        };
+    }
 
 }

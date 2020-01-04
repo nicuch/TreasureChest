@@ -12,67 +12,67 @@ import com.mtihc.minecraft.treasurechest.v8.rewardfactory.RewardFactoryManager;
 
 public abstract class SelectRewardTypePrompt extends ValidatingPrompt {
 
-	private RewardFactoryManager manager;
+    private RewardFactoryManager manager;
 
-	public SelectRewardTypePrompt(RewardFactoryManager manager) {
-		this.manager = manager;
-	}
+    public SelectRewardTypePrompt(RewardFactoryManager manager) {
+        this.manager = manager;
+    }
 
-	@Override
-	public String getPromptText(ConversationContext context) {
-		String[] types = manager.getFactoryLabels();
-		String typeString = "";
-		for (String type : types) {
-			typeString += ", " + type;
-		}
-		if (!typeString.isEmpty()) {
-			typeString = typeString.substring(2);
-		} else {
-			return ChatColor.RED + "There are no registered reward factories.";
-		}
-		context.getForWhom().sendRawMessage(
-				ChatColor.YELLOW + getMessage(context));
-		return typeString;
-	}
+    @Override
+    public String getPromptText(ConversationContext context) {
+        String[] types = manager.getFactoryLabels();
+        StringBuilder typeString = new StringBuilder();
+        for (String type : types) {
+            typeString.append(", ").append(type);
+        }
+        if (typeString.length() > 0) {
+            typeString = new StringBuilder(typeString.substring(2));
+        } else {
+            return ChatColor.RED + "There are no registered reward factories.";
+        }
+        context.getForWhom().sendRawMessage(
+                ChatColor.YELLOW + getMessage(context));
+        return typeString.toString();
+    }
 
-	@Override
-	protected boolean isInputValid(ConversationContext context, String input) {
-		if (manager.getFactoryTotal() == 0) {
-			// make sure we don't get stuck in the conversation, when there are
-			// no factories
-			return true;
-		}
+    @Override
+    protected boolean isInputValid(ConversationContext context, String input) {
+        if (manager.getFactoryTotal() == 0) {
+            // make sure we don't get stuck in the conversation, when there are
+            // no factories
+            return true;
+        }
 
-		if (input.startsWith("/")) {
-			Bukkit.dispatchCommand((CommandSender) context.getForWhom(), input);
-			return false;
-		}
-		if (manager.hasFactory(input)) {
-			return true;
-		} else {
-			context.getForWhom().sendRawMessage(
-					ChatColor.RED + "Reward type \"" + input
-							+ "\" doesn't exist.");
-			return false;
-		}
-	}
+        if (input.startsWith("/")) {
+            Bukkit.dispatchCommand((CommandSender) context.getForWhom(), input);
+            return false;
+        }
+        if (manager.hasFactory(input)) {
+            return true;
+        } else {
+            context.getForWhom().sendRawMessage(
+                    ChatColor.RED + "Reward type \"" + input
+                            + "\" doesn't exist.");
+            return false;
+        }
+    }
 
-	@Override
-	protected Prompt acceptValidatedInput(ConversationContext context,
-			String input) {
-		if (manager.getFactoryTotal() == 0) {
-			// make sure we don't get stuck in the conversation, when there are
-			// no factories
-			return END_OF_CONVERSATION;
-		}
+    @Override
+    protected Prompt acceptValidatedInput(ConversationContext context,
+                                          String input) {
+        if (manager.getFactoryTotal() == 0) {
+            // make sure we don't get stuck in the conversation, when there are
+            // no factories
+            return END_OF_CONVERSATION;
+        }
 
-		RewardFactory f = manager.getFactory(input);
+        RewardFactory f = manager.getFactory(input);
 
-		return onFinish(context, f);
-	}
+        return onFinish(context, f);
+    }
 
-	protected abstract Prompt onFinish(ConversationContext context,
-			RewardFactory factory);
+    protected abstract Prompt onFinish(ConversationContext context,
+                                       RewardFactory factory);
 
-	protected abstract String getMessage(ConversationContext context);
+    protected abstract String getMessage(ConversationContext context);
 }

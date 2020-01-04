@@ -12,40 +12,40 @@ import com.mtihc.minecraft.treasurechest.v8.events.TreasureChestFoundUnlimitedEv
 
 class BankRobberListener implements Listener {
 
-	private BankRobberRewardFactory factory;
+    private BankRobberRewardFactory factory;
 
-	BankRobberListener(BankRobberRewardFactory factory) {
-		this.factory = factory;
-	}
-	
-	
-	@EventHandler
-	public void onPlayerJoinEvent(PlayerJoinEvent event) {
-		factory.onPlayerJoin(event);
-	}
+    BankRobberListener(BankRobberRewardFactory factory) {
+        this.factory = factory;
+    }
 
-	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		factory.onPlayerQuit(event);
-	}
-	
-	@EventHandler
-	public void onPlayerKick(PlayerKickEvent event) {
-		factory.onPlayerKick(event);
-	}
-	
-	@EventHandler
-	public void onPlayerDeath(PlayerDeathEvent event) {
-		factory.onPlayerDeath(event);
-	}
-	
-	@EventHandler
-	public void onTreasureChestFound(TreasureChestFoundEvent event) {
-		factory.onTreasureChestFound(event);
-	}
-	
-	@EventHandler
-	public void onTreasureChestFoundUnlimited(TreasureChestFoundUnlimitedEvent event) {
-		factory.onTreasureChestFoundUnlimited(event);
-	}
+
+    @EventHandler
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        factory.onPlayerJoin(event);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        factory.onPlayerQuit(event);
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        factory.onPlayerKick(event);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        factory.onPlayerDeath(event);
+    }
+
+    @EventHandler
+    public void onTreasureChestFound(TreasureChestFoundEvent event) {
+        factory.onTreasureChestFound(event);
+    }
+
+    @EventHandler
+    public void onTreasureChestFoundUnlimited(TreasureChestFoundUnlimitedEvent event) {
+        factory.onTreasureChestFoundUnlimited(event);
+    }
 }

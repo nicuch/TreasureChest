@@ -1,6 +1,12 @@
 [Tt]est*/
 
 #################
+## IntelliJ IDEA
+#################
+
+/.idea/
+
+#################
 ## Eclipse
 #################
 
@@ -64,7 +70,6 @@ local.properties
 *.tlb
 *.tli
 *.tlh
-*.tmp
 *.vspscc
 .builds
 *.dotCover

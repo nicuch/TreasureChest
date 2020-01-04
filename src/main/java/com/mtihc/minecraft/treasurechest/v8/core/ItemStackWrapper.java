@@ -9,41 +9,39 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * This is just a wrapper class for ItemStack. In case we need to do some custom serialization.
- * 
- * @author Mitch
  *
+ * @author Mitch
  */
 public class ItemStackWrapper implements ConfigurationSerializable {
 
-	private ItemStack stack;
+    private ItemStack stack;
 
 
-	public ItemStack getItemStack() {
-		return stack;
-	}
-	
-	public void setItemStack(ItemStack stack) {
-		if(stack == null) {
-			this.stack = new ItemStack(Material.AIR);
-		}
-		else {
-			this.stack = stack.clone();
-		}
-	}
-	
-	public ItemStackWrapper(ItemStack stack) {
-		setItemStack(stack);
-	}
-	
-	public ItemStackWrapper(Map<String, Object> values) {
-		setItemStack( (ItemStack) values.get("stack"));
-	}
+    public ItemStack getItemStack() {
+        return stack;
+    }
 
-	@Override
-	public Map<String, Object> serialize() {
-		Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("stack", stack);
-		
-		return values;
-	}
+    public void setItemStack(ItemStack stack) {
+        if (stack == null) {
+            this.stack = new ItemStack(Material.AIR);
+        } else {
+            this.stack = stack.clone();
+        }
+    }
+
+    public ItemStackWrapper(ItemStack stack) {
+        setItemStack(stack);
+    }
+
+    public ItemStackWrapper(Map<String, Object> values) {
+        setItemStack((ItemStack) values.get("stack"));
+    }
+
+    @Override
+    public Map<String, Object> serialize() {
+        Map<String, Object> values = new LinkedHashMap<>();
+        values.put("stack", stack);
+
+        return values;
+    }
 }

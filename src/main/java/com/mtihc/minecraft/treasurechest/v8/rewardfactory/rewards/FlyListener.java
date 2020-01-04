@@ -8,24 +8,24 @@ import org.bukkit.event.server.PluginDisableEvent;
 
 class FlyListener implements Listener {
 
-	private FlyRewardFactory factory;
+    private FlyRewardFactory factory;
 
-	FlyListener(FlyRewardFactory factory) {
-		this.factory = factory;
-	}
-	
-	@EventHandler
-	public void onPluginDisable(PluginDisableEvent event) {
-		factory.cancelAllFlight();
-	}
-	
-	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		factory.cancelFlight(event.getPlayer());
-	}
-	
-	@EventHandler
-	public void onPlayerKick(PlayerKickEvent event) {
-		factory.cancelFlight(event.getPlayer());
-	}
+    FlyListener(FlyRewardFactory factory) {
+        this.factory = factory;
+    }
+
+    @EventHandler
+    public void onPluginDisable(PluginDisableEvent event) {
+        factory.cancelAllFlight();
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        factory.cancelFlight(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        factory.cancelFlight(event.getPlayer());
+    }
 }

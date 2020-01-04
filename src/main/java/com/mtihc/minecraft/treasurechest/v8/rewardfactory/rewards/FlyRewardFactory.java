@@ -17,143 +17,141 @@ import com.mtihc.minecraft.treasurechest.v8.rewardfactory.RewardInfo;
 
 public class FlyRewardFactory extends RewardFactory {
 
-	private final JavaPlugin plugin;
-	private final Map<String, FlyTimer> active = new HashMap<String, FlyTimer>();
-	
-	public FlyRewardFactory(JavaPlugin plugin) {
-		this.plugin = plugin;
-		
-		Listener listener = new FlyListener(this);
-		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
-	}
+    private final JavaPlugin plugin;
+    private final Map<String, FlyTimer> active = new HashMap<>();
 
-	@Override
-	public String getLabel() {
-		return "fly";
-	}
+    public FlyRewardFactory(JavaPlugin plugin) {
+        this.plugin = plugin;
 
-	@Override
-	public String getGeneralDescription() {
-		return "allow flight for some time";
-	}
+        Listener listener = new FlyListener(this);
+        plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+    }
 
-	@Override
-	public IReward createReward(RewardInfo info) throws RewardException {
-		return new FlyReward(this, info);
-	}
+    @Override
+    public String getLabel() {
+        return "fly";
+    }
 
-	@Override
-	public void createReward(CommandSender sender, String[] args,
-			CreateCallback callback) {
-		int seconds;
-		try {
-			seconds = Integer.parseInt(args[0]);
-		} catch(IndexOutOfBoundsException e) {
-			callback.onCreateException(sender, args, new RewardException("Not enough arguments. Expected an amount of seconds."));
-			return;
-		} catch(NumberFormatException e) {
-			callback.onCreateException(sender, args, new RewardException("Expected an amount of seconds, instead of text."));
-			return;
-		}
-		if(seconds < 1) {
-			callback.onCreateException(sender, args, new RewardException("Expected an amount of seconds, larger than zero."));
-			return;
-		}
+    @Override
+    public String getGeneralDescription() {
+        return "allow flight for some time";
+    }
 
-		callback.onCreate(sender, args, new FlyReward(this, seconds));
-		
-	}
+    @Override
+    public IReward createReward(RewardInfo info) {
+        return new FlyReward(this, info);
+    }
 
-	@Override
-	public String args() {
-		return "seconds";
-	}
+    @Override
+    public void createReward(CommandSender sender, String[] args,
+                             CreateCallback callback) {
+        int seconds;
+        try {
+            seconds = Integer.parseInt(args[0]);
+        } catch (IndexOutOfBoundsException e) {
+            callback.onCreateException(sender, args, new RewardException("Not enough arguments. Expected an amount of seconds."));
+            return;
+        } catch (NumberFormatException e) {
+            callback.onCreateException(sender, args, new RewardException("Expected an amount of seconds, instead of text."));
+            return;
+        }
+        if (seconds < 1) {
+            callback.onCreateException(sender, args, new RewardException("Expected an amount of seconds, larger than zero."));
+            return;
+        }
 
-	@Override
-	public String[] help() {
-		return new String[] {
-				"Specify how many seconds the player can fly."
-		};
-	}
+        callback.onCreate(sender, args, new FlyReward(this, seconds));
 
-	protected void startFlight(Player player, FlyReward flyReward) {
-		new FlyTimer(player).schedule(flyReward.getSeconds());
-	}
+    }
 
-	protected void cancelFlight(Player player) {
-		FlyTimer timer = active.remove(player.getName());
-		if(timer != null) {
-			timer.cancel();
-		}
-	}
-	
-	protected void cancelAllFlight() {
-		Iterator<FlyTimer> it = active.values().iterator();
-		while(it.hasNext()) {
-			FlyTimer timer = it.next();
-			it.remove();
-			timer.cancel();
-		}
-	}
-	
-	private class FlyTimer implements Runnable {
+    @Override
+    public String args() {
+        return "seconds";
+    }
 
-		private int taskId;
-		private Player player;
-		private boolean originalAllowFlight;
+    @Override
+    public String[] help() {
+        return new String[]{
+                "Specify how many seconds the player can fly."
+        };
+    }
 
-		private FlyTimer(Player player) {
-			taskId = -1;
-			this.player = player;
-			this.originalAllowFlight = player.getAllowFlight();
-		}
-		
-		public boolean isRunning() {
-			return taskId != -1;
-		}
-		
-		public void schedule(int seconds) {
-			// reschedule without changing anything
-			doCancel();
-			BukkitTask task = plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, this, seconds * 20L);
-			taskId = task.getTaskId();
+    protected void startFlight(Player player, FlyReward flyReward) {
+        new FlyTimer(player).schedule(flyReward.getSeconds());
+    }
 
-			player.setAllowFlight(true);
-			player.setFlying(true);
-			active.put(player.getName(), this);
-		}
-		
-		private boolean doCancel() {
-			if(isRunning()) {
-				plugin.getServer().getScheduler().cancelTask(taskId);
-				taskId = -1;
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-		
-		@Override
-		public void run() {
-			cancel();
-		}
+    protected void cancelFlight(Player player) {
+        FlyTimer timer = active.remove(player.getName());
+        if (timer != null) {
+            timer.cancel();
+        }
+    }
 
-		
-		public boolean cancel() {
-			if(doCancel()) {
-				// stop flying
+    protected void cancelAllFlight() {
+        Iterator<FlyTimer> it = active.values().iterator();
+        while (it.hasNext()) {
+            FlyTimer timer = it.next();
+            it.remove();
+            timer.cancel();
+        }
+    }
 
-				player.setFlying(false);
-				player.setAllowFlight(originalAllowFlight);
-				player.saveData();
-				active.remove(player.getName());
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-	}
+    private class FlyTimer implements Runnable {
+
+        private int taskId;
+        private Player player;
+        private boolean originalAllowFlight;
+
+        private FlyTimer(Player player) {
+            taskId = -1;
+            this.player = player;
+            this.originalAllowFlight = player.getAllowFlight();
+        }
+
+        public boolean isRunning() {
+            return taskId != -1;
+        }
+
+        public void schedule(int seconds) {
+            // reschedule without changing anything
+            doCancel();
+            BukkitTask task = plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, this, seconds * 20L);
+            taskId = task.getTaskId();
+
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            active.put(player.getName(), this);
+        }
+
+        private boolean doCancel() {
+            if (isRunning()) {
+                plugin.getServer().getScheduler().cancelTask(taskId);
+                taskId = -1;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public void run() {
+            cancel();
+        }
+
+
+        public boolean cancel() {
+            if (doCancel()) {
+                // stop flying
+
+                player.setFlying(false);
+                player.setAllowFlight(originalAllowFlight);
+                player.saveData();
+                active.remove(player.getName());
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
 
 }
